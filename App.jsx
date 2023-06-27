@@ -23,6 +23,7 @@ export default function App() {
             setNotes(notesArray)
         })
         return unsubscribe
+        // This is an commit
     }, [])
     React.useEffect(() => {
         if(!currentNoteId){
