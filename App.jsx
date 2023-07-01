@@ -8,6 +8,8 @@ import { addDoc, deleteDoc, doc, onSnapshot, setDoc } from 'firebase/firestore'
 export default function App() {
     const [notes, setNotes] = React.useState([])
     const [currentNoteId, setCurrentNoteId] = React.useState("")
+    const [tempNoteText, setTempNoteText] = React.useState("")
+
     const sortedArray = notes.sort((a, b) => b.updatedAt - a.updatedAt)
 
     const currentNote = 
@@ -23,13 +25,26 @@ export default function App() {
             setNotes(notesArray)
         })
         return unsubscribe
-        // This is an commit
     }, [])
     React.useEffect(() => {
         if(!currentNoteId){
             setCurrentNoteId(notes[0]?.id)
         }
     }, [notes])
+    React.useEffect(() => {
+        if(currentNote){
+            setTempNoteText(currentNote.body)
+        }
+    }, [currentNote])
+
+    React.useEffect(() => {
+        const timeOutId = setTimeout(() => {
+        if(tempNoteText !== currentNote.body){
+            updateNote(tempNoteText)
+        }
+        }, 500)
+        return () => clearTimeout(timeOutId)
+    }, [tempNoteText])
     async function createNewNote() {
         const newNote = {
             createdAt: Date.now(),
@@ -68,8 +83,8 @@ export default function App() {
                             deleteNote={deleteNote}
                         />
                         <Editor
-                            currentNote={currentNote}
-                            updateNote={updateNote}
+                            tempNoteText={tempNoteText}
+                            setTempNoteText={setTempNoteText}
                         />
                     </Split>
                     :
